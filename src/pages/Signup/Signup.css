@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;600;700&display=swap');
+
+/* Base page styling */
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    /* Makes sure the image covers the whole screen */
+    background-position: center;
+    /* Centers the image */
+    background-attachment: fixed;
+    /* Keeps the background still if you scroll */
+    /* Soft blue-gray background from theme */
+    font-family: 'Abhaya Libre', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+}
+
+/* Logo above card */
+.logo-container {
+    margin-bottom: 20px;
+}
+
+.brand-logo {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: White;
+}
+
+/* Main Card Layout */
+.signup-card {
+    display: flex;
+    width: 100%;
+    max-width: 850px;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* Left side - Form */
+.form-section {
+    flex: 1.5;
+    padding: 40px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-section h2 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Inputs */
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+.input-group input,
+.input-group select {
+    padding: 14px 16px;
+    border: none;
+    background-color: #F3F4F7;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #000000;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #7793E9;
+    background-color: #FFF;
+}
+
+.input-group select {
+    appearance: none;
+}
+
+.row-group {
+    flex-direction: row;
+    gap: 15px;
+}
+
+.half-width {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Validation Errors */
+.error-text {
+    color: #d9534f;
+    font-size: 12px;
+    margin-top: 5px;
+    margin-left: 5px;
+}
+
+.error-banner {
+    background: #fdecea;
+    color: #b42318;
+    border: 1px solid #f5c2c0;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Buttons */
+.register-btn {
+    margin-top: 10px;
+    padding: 14px;
+    background-color: #7793E9;
+    /* Blue from theme */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.register-btn:hover {
+    background-color: #5c7be3;
+}
+
+.register-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Right side - Theme Panel */
+.theme-section {
+    flex: 1;
+    background-color: #7793E9;
+    color: white;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-top-left-radius: 60px;
+    /* Curve effect like the theme */
+    border-bottom-left-radius: 60px;
+}
+
+.theme-section h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.theme-section p {
+    margin-bottom: 30px;
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.login-btn {
+    text-decoration: none;
+    color: white;
+    border: 1px solid white;
+    padding: 10px 40px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: white;
+    color: #7793E9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .signup-card {
+        flex-direction: column-reverse;
+        max-width: 400px;
+    }
+
+    .theme-section {
+        border-radius: 0;
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
+        padding: 30px 20px;
+    }
+
+    .form-section {
+        padding: 30px 20px;
+    }
+
+    .row-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+}

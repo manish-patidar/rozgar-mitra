@@ -1,0 +1,11 @@
+/* Reuse the same theme as Signup */
+@import '../Signup/Signup.css';
+
+/* Additional small tweaks for login if needed */
+.form-section h2 {
+    margin-bottom: 20px;
+}
+
+.register-btn {
+    width: 100%;
+}
