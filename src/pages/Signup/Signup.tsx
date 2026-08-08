@@ -115,6 +115,7 @@ const Signup: React.FC = () => {
         if (!validateForm()) {
             return;
         }
+        console.log('dgdfg')
 
         try {
             setIsLoading(true);
