@@ -1,8 +1,10 @@
+import type { Dayjs } from 'dayjs';
+
 export interface SignupFormState {
     name: string;
     username: string;
     email: string;
-    age: string;
+    dateOfBirth: Dayjs | null;
     phone: string;
     password: string;
     role: string;

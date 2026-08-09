@@ -5,6 +5,7 @@ import Alert from '@mui/material/Alert';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {
     AuthBrandRow,
     AuthCard,
@@ -21,16 +22,18 @@ import { SignupRowGroup } from './signup.styles';
 import { extractAuthToken, signupRequest } from '../../api/auth.api';
 import { getApiErrorMessage } from '../../api/client';
 import { setAuthToken, setUserRole } from '../../utils/auth';
+import { getAgeFromDate, getDateOfBirthBounds } from '../../utils/date';
 import { BRAND_NAME, MESSAGES, REGEX, ROLE_OPTIONS, ROUTES, VALIDATION } from '../../utils/constants';
 import logo from '../../public/download.webp';
 import heroWorker from '../../public/hero-worker.jpg';
 import type { SignupFormErrors, SignupFormState } from './signup.types';
+import type { Dayjs } from 'dayjs';
 
 const INITIAL_FORM_STATE: SignupFormState = {
     name: '',
     username: '',
     email: '',
-    age: '',
+    dateOfBirth: null,
     phone: '',
     password: '',
     role: ROLE_OPTIONS[0].value,
@@ -53,12 +56,12 @@ const validate = (form: SignupFormState): SignupFormErrors => {
         errors.email = MESSAGES.FIELD_INVALID_EMAIL;
     }
 
-    if (!form.age) {
-        errors.age = MESSAGES.FIELD_REQUIRED_AGE;
+    if (!form.dateOfBirth) {
+        errors.dateOfBirth = MESSAGES.FIELD_REQUIRED_DOB;
     } else {
-        const ageNum = Number(form.age);
-        if (Number.isNaN(ageNum) || ageNum < VALIDATION.AGE_MIN || ageNum > VALIDATION.AGE_MAX) {
-            errors.age = MESSAGES.FIELD_INVALID_AGE;
+        const age = getAgeFromDate(form.dateOfBirth);
+        if (age < VALIDATION.AGE_MIN || age > VALIDATION.AGE_MAX) {
+            errors.dateOfBirth = MESSAGES.FIELD_INVALID_DOB;
         }
     }
 
@@ -85,6 +88,7 @@ const Signup: FC = () => {
     const [errors, setErrors] = useState<SignupFormErrors>({});
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState('');
+    const dobBounds = getDateOfBirthBounds();
 
     const handleChange = (field: keyof SignupFormState) => (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -94,12 +98,17 @@ const Signup: FC = () => {
         setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev));
     };
 
+    const handleDateOfBirthChange = (value: Dayjs | null) => {
+        setForm((prev) => ({ ...prev, dateOfBirth: value }));
+        setErrors((prev) => (prev.dateOfBirth ? { ...prev, dateOfBirth: undefined } : prev));
+    };
+
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const validationErrors = validate(form);
         setErrors(validationErrors);
-        if (Object.keys(validationErrors).length > 0) return;
+        if (Object.keys(validationErrors).length > 0 || !form.dateOfBirth) return;
 
         try {
             setIsLoading(true);
@@ -109,7 +118,7 @@ const Signup: FC = () => {
                 name: form.name.trim(),
                 username: form.username.trim(),
                 email: form.email.trim(),
-                age: Number(form.age),
+                age: getAgeFromDate(form.dateOfBirth),
                 phone_number: form.phone.trim(),
                 password: form.password,
                 role: form.role,
@@ -156,7 +165,7 @@ const Signup: FC = () => {
                     {apiError && <Alert severity="error">{apiError}</Alert>}
 
                     <TextField
-                        label="Full Name"
+                        label={MESSAGES.SIGNUP_NAME_LABEL}
                         value={form.name}
                         onChange={handleChange('name')}
                         error={Boolean(errors.name)}
@@ -165,7 +174,7 @@ const Signup: FC = () => {
                     />
 
                     <TextField
-                        label="Username"
+                        label={MESSAGES.SIGNUP_USERNAME_LABEL}
                         value={form.username}
                         onChange={handleChange('username')}
                         error={Boolean(errors.username)}
@@ -174,7 +183,7 @@ const Signup: FC = () => {
                     />
 
                     <TextField
-                        label="Email Address"
+                        label={MESSAGES.SIGNUP_EMAIL_LABEL}
                         type="email"
                         value={form.email}
                         onChange={handleChange('email')}
@@ -184,19 +193,25 @@ const Signup: FC = () => {
                     />
 
                     <SignupRowGroup>
-                        <TextField
-                            label="Age"
-                            type="number"
-                            value={form.age}
-                            onChange={handleChange('age')}
-                            error={Boolean(errors.age)}
-                            helperText={errors.age}
-                            fullWidth
+                        <DatePicker
+                            label={MESSAGES.SIGNUP_DOB_LABEL}
+                            value={form.dateOfBirth}
+                            onChange={handleDateOfBirthChange}
+                            minDate={dobBounds.minDate}
+                            maxDate={dobBounds.maxDate}
+                            sx={{ width: '100%' }}
+                            slotProps={{
+                                textField: {
+                                    fullWidth: true,
+                                    error: Boolean(errors.dateOfBirth),
+                                    helperText: errors.dateOfBirth,
+                                },
+                            }}
                         />
                         <TextField
-                            label="Phone"
+                            label={MESSAGES.SIGNUP_PHONE_LABEL}
                             type="tel"
-                            placeholder="+919876543210"
+                            placeholder={MESSAGES.SIGNUP_PHONE_PLACEHOLDER}
                             value={form.phone}
                             onChange={handleChange('phone')}
                             error={Boolean(errors.phone)}
@@ -207,7 +222,7 @@ const Signup: FC = () => {
                     </SignupRowGroup>
 
                     <TextField
-                        label="Password"
+                        label={MESSAGES.SIGNUP_PASSWORD_LABEL}
                         type="password"
                         value={form.password}
                         onChange={handleChange('password')}
@@ -218,7 +233,7 @@ const Signup: FC = () => {
 
                     <TextField
                         select
-                        label="Role"
+                        label={MESSAGES.SIGNUP_ROLE_LABEL}
                         value={form.role}
                         onChange={handleChange('role')}
                         error={Boolean(errors.role)}
