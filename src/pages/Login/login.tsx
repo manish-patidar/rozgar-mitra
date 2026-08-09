@@ -1,21 +1,49 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import './login.css';
-import { loginRequest, saveAuthToken } from '../../utils/api';
+import { useState } from 'react';
+import type { FC, FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import {
+    AuthBrandRow,
+    AuthCard,
+    AuthForm,
+    AuthIllustrationBox,
+    AuthIllustrationImage,
+    AuthLogo,
+    AuthPageContainer,
+    AuthSubmitButton,
+    AuthSwitchButton,
+    AuthSwitchRow,
+} from '../../components/auth/AuthLayout.styles';
+import { loginRequest, extractAuthToken, extractUserRole } from '../../api/auth.api';
+import { getApiErrorMessage } from '../../api/client';
+import { setAuthToken, setUserRole } from '../../utils/auth';
+import { BRAND_NAME, MESSAGES, ROUTES } from '../../utils/constants';
 import logo from '../../public/download.webp';
-import bg from '../../public/bg.jpg';
+import heroWorker from '../../public/hero-worker.jpg';
+import type { LoginFormState } from './login.types';
 
-const Login: React.FC = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+const INITIAL_FORM_STATE: LoginFormState = {
+    username: '',
+    password: '',
+};
+
+const Login: FC = () => {
+    const navigate = useNavigate();
+    const [form, setForm] = useState<LoginFormState>(INITIAL_FORM_STATE);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleChange = (field: keyof LoginFormState) => (event: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({ ...prev, [field]: event.target.value }));
+    };
 
-        if (!username || !password) {
-            setError('Please enter username and password');
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        if (!form.username || !form.password) {
+            setError(MESSAGES.LOGIN_MISSING_FIELDS);
             return;
         }
 
@@ -23,97 +51,86 @@ const Login: React.FC = () => {
             setIsLoading(true);
             setError('');
 
-            const response = await loginRequest({ username, password });
-            const token = saveAuthToken(response.data);
+            const response = await loginRequest(form);
+            const token = extractAuthToken(response.data);
 
             if (!token) {
-                setError(response.data.message ?? 'Login succeeded but no token was returned.');
+                setError(response.data.message ?? MESSAGES.LOGIN_NO_TOKEN);
                 return;
             }
 
-            window.location.href = '/home';
-        } catch (requestError) {
-            if (axios.isAxiosError(requestError)) {
-                const backendMessage =
-                    requestError.response?.data?.message ??
-                    requestError.response?.data?.error ??
-                    requestError.response?.data ??
-                    requestError.message;
+            setAuthToken(token);
 
-                setError(`Login failed: ${String(backendMessage)}`);
-            } else {
-                setError('Login failed. Please check your credentials and try again.');
+            const role = extractUserRole(response.data);
+            if (role) {
+                setUserRole(role);
             }
-            console.error('Login request failed:', requestError);
+
+            navigate(ROUTES.HOME, { replace: true });
+        } catch (requestError) {
+            setError(getApiErrorMessage(requestError, MESSAGES.LOGIN_GENERIC_ERROR));
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div
-            className="page-container"
-            style={{
-                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(${bg})`,
-            }}
-        >
-            <div className="logo-container">
-                <img src={logo} alt="Rozgarmitra Logo" className="brand-logo" />
-            </div>
+        <AuthPageContainer>
+            <AuthCard>
+                <AuthBrandRow>
+                    <AuthLogo src={logo} alt={`${BRAND_NAME} Logo`} />
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                        {BRAND_NAME}
+                    </Typography>
+                </AuthBrandRow>
 
-            <div className="signup-card">
-                <div className="form-section">
-                    <h2>Customer Login</h2>
-                    <form onSubmit={handleSubmit} className="signup-form">
-                        {error && <div className="error-banner">{error}</div>}
+                <AuthIllustrationBox>
+                    <AuthIllustrationImage src={heroWorker} alt="A friendly professional ready to help" />
+                </AuthIllustrationBox>
 
-                        <div className="input-group">
-                            <input
-                                type="text"
-                                name="username"
-                                placeholder="Username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                        </div>
+                <Typography variant="h5" sx={{ fontWeight: 800 }}>
+                    {MESSAGES.LOGIN_TITLE}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    {MESSAGES.LOGIN_SUBTITLE}
+                </Typography>
 
-                        <div className="input-group">
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
+                <AuthForm onSubmit={handleSubmit} noValidate>
+                    {error && <Alert severity="error">{error}</Alert>}
 
-                        <button type="submit" className="register-btn" disabled={isLoading}>
-                            {isLoading ? 'Logging in...' : 'Login'}
-                        </button>
-                    </form>
-                </div>
+                    <TextField
+                        label="Username"
+                        name="username"
+                        value={form.username}
+                        onChange={handleChange('username')}
+                        fullWidth
+                    />
 
-                <div className="theme-section">
-                    <h2>Welcome Back!</h2>
-                    <p>Don't have an account?</p>
-                    <a
-                        href="/"
-                        className="login-btn"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            window.history.pushState({}, '', '/');
-                            window.dispatchEvent(new PopStateEvent('popstate'));
-                        }}
-                    >
-                        Register
-                    </a>
-                </div>
-            </div>
-        </div>
+                    <TextField
+                        label="Password"
+                        name="password"
+                        type="password"
+                        value={form.password}
+                        onChange={handleChange('password')}
+                        fullWidth
+                    />
+
+                    <AuthSubmitButton type="submit" variant="contained" fullWidth disabled={isLoading}>
+                        {isLoading ? MESSAGES.LOGIN_SUBMITTING : MESSAGES.LOGIN_SUBMIT}
+                    </AuthSubmitButton>
+                </AuthForm>
+
+                <AuthSwitchRow>
+                    <Typography variant="body2" color="text.secondary">
+                        {MESSAGES.LOGIN_SWITCH_PROMPT}
+                    </Typography>
+                    <AuthSwitchButton onClick={() => navigate(ROUTES.SIGNUP)}>
+                        {MESSAGES.LOGIN_SWITCH_ACTION}
+                    </AuthSwitchButton>
+                </AuthSwitchRow>
+            </AuthCard>
+        </AuthPageContainer>
     );
 };
 
 export default Login;
-
-
-
