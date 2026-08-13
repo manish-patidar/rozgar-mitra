@@ -11,15 +11,36 @@ export const buildCategoryDetailPath = (categoryId: string): string => `/categor
 // Validation regex patterns
 export const REGEX = {
     EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    PHONE: /^\+[1-9]\d{6,14}$/,
+    PHONE: /^\+91\d{10}$/,
 } as const;
 
 // Field length / value constraints
 export const VALIDATION = {
+    NAME_MAX_LENGTH: 35,
+    USERNAME_MAX_LENGTH: 35,
+    EMAIL_MAX_LENGTH: 64,
     USERNAME_MIN_LENGTH: 4,
-    PASSWORD_MIN_LENGTH: 6,
-    AGE_MIN: 18,
+    PASSWORD_MIN_LENGTH: 8,
+    AGE_MIN: 13,
     AGE_MAX: 100,
+    ADDRESS_APARTMENT_DIGITS: 4,
+    ADDRESS_PINCODE_DIGITS: 6,
+    ADDRESS_BUILDING_MAX_LENGTH: 255,
+    ADDRESS_COLONY_MAX_LENGTH: 255,
+    ADDRESS_CITY_MAX_LENGTH: 35,
+    ADDRESS_STATE_MAX_LENGTH: 60,
+    ADDRESS_COUNTRY_MAX_LENGTH: 35,
+} as const;
+
+export const ADDRESS_VALIDATION = {
+    APARTMENT_PATTERN: /^\d{1,4}$/,
+    PINCODE_PATTERN: /^\d{6}$/,
+    TEXT_PATTERN: /^[A-Za-z\s.'-]+$/,
+    BUILDING_NAME: { maxLength: VALIDATION.ADDRESS_BUILDING_MAX_LENGTH },
+    COLONY: { maxLength: VALIDATION.ADDRESS_COLONY_MAX_LENGTH },
+    CITY: { maxLength: VALIDATION.ADDRESS_CITY_MAX_LENGTH },
+    STATE: { maxLength: VALIDATION.ADDRESS_STATE_MAX_LENGTH },
+    COUNTRY: { maxLength: VALIDATION.ADDRESS_COUNTRY_MAX_LENGTH },
 } as const;
 
 // localStorage keys
@@ -69,17 +90,20 @@ export const MESSAGES = {
     SIGNUP_SUCCESS: 'Registration successful',
     SIGNUP_GENERIC_ERROR: 'Registration failed. Please verify the backend response format.',
 
-    FIELD_REQUIRED_NAME: 'Name is required',
+    FIELD_REQUIRED_NAME: 'Full name is required',
     FIELD_REQUIRED_USERNAME: 'Username is required',
-    FIELD_INVALID_USERNAME: `Username must be at least ${VALIDATION.USERNAME_MIN_LENGTH} characters`,
+    FIELD_INVALID_USERNAME: `Username must be 1 to ${VALIDATION.USERNAME_MAX_LENGTH} characters and may contain letters, numbers, and . _ @ - only`,
     FIELD_REQUIRED_EMAIL: 'Email is required',
-    FIELD_INVALID_EMAIL: 'Please enter a valid email',
+    FIELD_INVALID_EMAIL: `Email must be valid and up to ${VALIDATION.EMAIL_MAX_LENGTH} characters`,
     FIELD_REQUIRED_DOB: 'Date of birth is required',
-    FIELD_INVALID_DOB: `You must be between ${VALIDATION.AGE_MIN} and ${VALIDATION.AGE_MAX} years old`,
+    FIELD_INVALID_DOB: `You must be at least ${VALIDATION.AGE_MIN} years old`,
     FIELD_REQUIRED_PHONE: 'Phone number is required',
-    FIELD_INVALID_PHONE: 'Phone must start with +country code, for example +919876543210',
+    FIELD_INVALID_PHONE: 'Phone must be a valid 10-digit Indian mobile number with +91 prefix',
+    FIELD_REQUIRED_ADDRESS: 'Address is required',
+    ADDRESS_DETECTING: 'Detecting your location...',
+    ADDRESS_DETECT_FAILED: 'Location access was denied. You can still enter your address manually.',
     FIELD_REQUIRED_PASSWORD: 'Password is required',
-    FIELD_INVALID_PASSWORD: `Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters`,
+    FIELD_INVALID_PASSWORD: `Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character`,
     FIELD_REQUIRED_ROLE: 'Role is required',
 
     LOGIN_USERNAME_LABEL: 'Username',
