@@ -95,7 +95,13 @@ const Login: FC = () => {
                 setUserRole(role);
             }
 
-            navigate(ROUTES.HOME, { replace: true });
+            if (role === 'ROLE_ADMIN' || role === 'ADMIN') {
+                navigate('/admin', { replace: true });
+            } else if (role === 'ROLE_LABOUR' || role === 'LABOUR') {
+                navigate(ROUTES.LABOUR, { replace: true });
+            } else {
+                navigate(ROUTES.HOME, { replace: true });
+            }
         } catch (requestError) {
             setError(getApiErrorMessage(requestError, MESSAGES.LOGIN_GENERIC_ERROR));
         } finally {

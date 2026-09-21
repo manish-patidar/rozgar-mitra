@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import type { AddressData, AddressErrors } from '../../types/address';
-import { detectLocationDetails } from '../../services/locationService';
+import { detectLocationDetails } from '../../services/Location/locationService';
 
 interface AddressSectionProps {
     address: AddressData;

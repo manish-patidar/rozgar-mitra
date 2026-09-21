@@ -30,6 +30,17 @@ export const apiPost = <TResponse, TPayload = unknown>(
     config?: AxiosRequestConfig,
 ): Promise<AxiosResponse<TResponse>> => apiClient.post<TResponse>(url, payload, config);
 
+export const apiPut = <TResponse, TPayload = unknown>(
+    url: string,
+    payload?: TPayload,
+    config?: AxiosRequestConfig,
+): Promise<AxiosResponse<TResponse>> => apiClient.put<TResponse>(url, payload, config);
+
+export const apiDelete = <TResponse>(
+    url: string,
+    config?: AxiosRequestConfig,
+): Promise<AxiosResponse<TResponse>> => apiClient.delete<TResponse>(url, config);
+
 export const getApiErrorMessage = (error: unknown, fallback: string): string => {
     if (axios.isAxiosError(error)) {
         const data = error.response?.data as { message?: string; error?: string } | string | undefined;

@@ -1,4 +1,4 @@
-import type { AddressData } from '../types/address';
+import type { AddressData } from '../../types/address';
 
 export const detectLocationDetails = (): Promise<Partial<AddressData>> =>
     new Promise((resolve, reject) => {
